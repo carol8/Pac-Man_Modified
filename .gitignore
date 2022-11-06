@@ -1,0 +1,6 @@
+/venv/local/bin/
+/venv/lib/python2.7/encodings/
+/venv/local/include/
+/venv/local/lib/
+/venv/lib/python2.7/lib-dynload/
+/venv/include/python2.7/
