@@ -294,10 +294,10 @@ class PositionSearchProblem(search.SearchProblem):
         self.walls = gameState.getWalls()
         self.startState = gameState.getPacmanPosition()
         if start != None: self.startState = start
-        self.goal = goal
+        self.goal = gameState.getGoal()
         self.costFn = costFn
         self.visualize = visualize
-        if warn and (gameState.getNumFood() != 1 or not gameState.hasFood(*goal)):
+        if warn and (gameState.getNumFood() != 1 or not gameState.hasFood(*gameState.getGoal())):
             print 'Warning: this does not look like a regular search maze'
 
         # For display purposes
