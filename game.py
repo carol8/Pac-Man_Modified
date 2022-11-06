@@ -369,7 +369,9 @@ class Actions:
             dx, dy = Actions.incrementWithGoAround(dx, dy, incrementx, incrementy, walls)
             while walls[dx][dy]:
                 dx, dy = Actions.incrementWithGoAround(dx, dy, incrementx, incrementy, walls)
-            return ((dx - position[0]) * speed, (dy - position[1]) * speed)
+            ddx = (dx - position[0])
+            ddy = (dy - position[1])
+            return (ddx * speed, ddy * speed)
     directionToVector = staticmethod(directionToVector)
 
     def getPossibleActions(config, walls, portals):

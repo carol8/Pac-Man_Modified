@@ -514,6 +514,9 @@ def readCommand( argv ):
     parser.add_option('--layout-portals', dest='portals',
                       help=default('the LAYOUT_PORTAL_FILE from which to load the map portals'),
                       metavar='LAYOUT_FILE', default='mediumMazePortals')
+    parser.add_option("--layout-random-portals", dest='rand_portals',
+                      help=default('the ratio (0.0 - 1.0) of random portals to spawn'),
+                      default=0.0)
     parser.add_option('-p', '--pacman', dest='pacman',
                       help=default('the agent TYPE in the pacmanAgents module to use'),
                       metavar='TYPE', default='KeyboardAgent')
@@ -554,7 +557,7 @@ def readCommand( argv ):
     if options.fixRandomSeed: random.seed('cs188')
 
     # Choose a layout
-    args['layout'] = layout.getLayout(options.layout, portals_name=options.portals)
+    args['layout'] = layout.getLayout(options.layout, portals_name=options.portals,random_portals=float(options.rand_portals))
     if args['layout'] == None: raise Exception("The layout " + options.layout + " cannot be found")
 
     # Choose a Pacman agent

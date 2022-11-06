@@ -23,35 +23,23 @@ class Layout:
     """
     A Layout manages the static information about the game board.
     """
-
-    def __init__(self, layoutText):
+    def __init__(self, layoutText, portalsText=None, random_portals=0.0, portals=None):
         self.width = len(layoutText[0])
-        self.height= len(layoutText)
+        self.height = len(layoutText)
         self.walls = Grid(self.width, self.height, False)
         self.food = Grid(self.width, self.height, False)
         self.capsules = []
         self.agentPositions = []
         self.numGhosts = 0
         self.processLayoutText(layoutText)
-        self.layoutText = layoutText
-        self.portalsText = None
-        self.totalFood = len(self.food.asList())
-        # self.initializeVisibilityMatrix()
-
-    def __init__(self, layoutText, portalsText):
-        self.width = len(layoutText[0])
-        self.height= len(layoutText)
-        self.walls = Grid(self.width, self.height, False)
-        self.food = Grid(self.width, self.height, False)
-        self.portals = Grid(self.width, self.height, False)
-        self.capsules = []
-        self.agentPositions = []
-        self.numGhosts = 0
-        self.processLayoutText(layoutText)
-        self.processPortalsText(portalsText)
+        self.portals = portals
+        if portals is None:
+            self.portals = Grid(self.width, self.height, False)
+            self.processPortalsText(portalsText, self.walls, random_portals)
         self.layoutText = layoutText
         self.portalsText = portalsText
         self.totalFood = len(self.food.asList())
+        self.random_portals = random_portals
         # self.initializeVisibilityMatrix()
 
     def getNumGhosts(self):
@@ -113,6 +101,8 @@ class Layout:
 
     def deepCopy(self):
         if self.portalsText is not None:
+            if self.random_portals is not None:
+                return Layout(self.layoutText[:], self.portalsText[:], self.random_portals, self.portals[:])
             return Layout(self.layoutText[:], self.portalsText[:])
         return Layout(self.layoutText[:])
 
@@ -137,7 +127,7 @@ class Layout:
         self.agentPositions.sort()
         self.agentPositions = [ ( i == 0, pos) for i, pos in self.agentPositions]
 
-    def processPortalsText(self, portalsText):
+    def processPortalsText(self, portalsText, walls, random_portals):
         """
         Coordinates are flipped from the input format to the (x,y) convention here
 
@@ -154,7 +144,8 @@ class Layout:
         for y in range(self.height):
             for x in range(self.width):
                 layoutChar = portalsText[maxY - y][x]
-                if layoutChar == '0':
+                rng = random.random()
+                if layoutChar == '0' or rng < random_portals and walls[x][y]:
                     self.portals[x][y] = True
 
     def processLayoutChar(self, x, y, layoutChar):
@@ -172,15 +163,15 @@ class Layout:
         elif layoutChar in  ['1', '2', '3', '4']:
             self.agentPositions.append( (int(layoutChar), (x,y)))
             self.numGhosts += 1
-def getLayout(name, back = 2, portals_name=None):
+def getLayout(name, back = 2, portals_name=None, random_portals=0.0):
     if name.endswith('.lay'):
         layout = tryToLoad('layouts/' + name)
         if layout == None: layout = tryToLoad(name)
     else:
         if portals_name is not None:
-            layout = tryToLoad('layouts/' + name + '.lay', 'layouts/' + portals_name + '.lay')
+            layout = tryToLoad('layouts/' + name + '.lay', 'layouts/' + portals_name + '.lay', random_portals)
         else:
-            layout = tryToLoad('layouts/' + name + '.lay', None)
+            layout = tryToLoad('layouts/' + name + '.lay', None, random_portals)
         if layout == None: layout = tryToLoad(name + '.lay')
     if layout == None and back >= 0:
         curdir = os.path.abspath('.')
@@ -189,12 +180,12 @@ def getLayout(name, back = 2, portals_name=None):
         os.chdir(curdir)
     return layout
 
-def tryToLoad(fullname, portals_fullname):
+def tryToLoad(fullname, portals_fullname, random_portals):
     if(not os.path.exists(fullname)): return None
     f = open(fullname)
     if portals_fullname is not None:
         p = open(portals_fullname)
-        try: return Layout([line.strip() for line in f], [line.strip() for line in p])
+        try: return Layout([line.strip() for line in f], [line.strip() for line in p], random_portals)
         finally: f.close()
     else:
         try: return Layout([line.strip() for line in f])

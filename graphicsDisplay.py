@@ -79,6 +79,9 @@ CAPSULE_SIZE = 0.25
 # Drawing walls
 WALL_RADIUS = 0.15
 
+PORTAL_COLOR = formatColor(0,1,0)
+PORTAL_RADIUS = 0.3
+
 class InfoPane:
     def __init__(self, layout, gridSize):
         self.gridSize = gridSize
@@ -206,6 +209,7 @@ class PacmanGraphics:
         self.drawWalls(layout.walls)
         self.food = self.drawFood(layout.food)
         self.capsules = self.drawCapsules(layout.capsules)
+        self.portals = self.drawPortals(layout.portals)
         refresh()
 
     def drawAgentObjects(self, state):
@@ -541,6 +545,24 @@ class PacmanGraphics:
                     imageRow.append(None)
         return foodImages
 
+    def drawPortals(self, portalsMatrix):
+        foodImages = []
+        for xNum, x in enumerate(portalsMatrix):
+            imageRow = []
+            foodImages.append(imageRow)
+            for yNum, cell in enumerate(x):
+                if cell:  # There's food here
+                    screen = self.to_screen((xNum, yNum))
+                    dot = circle(screen,
+                                 PORTAL_RADIUS * self.gridSize,
+                                 outlineColor=PORTAL_COLOR,
+                                 fillColor=PORTAL_COLOR,
+                                 width=1)
+                    imageRow.append(dot)
+                else:
+                    imageRow.append(None)
+        return foodImages
+
     def drawCapsules(self, capsules ):
         capsuleImages = {}
         for capsule in capsules:
@@ -552,6 +574,7 @@ class PacmanGraphics:
                               width = 1)
             capsuleImages[capsule] = dot
         return capsuleImages
+
 
     def removeFood(self, cell, foodImages ):
         x, y = cell
