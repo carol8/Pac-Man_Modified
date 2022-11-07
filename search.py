@@ -165,7 +165,7 @@ def nineWayHeuristic(state, problem):
                 problem.walls.height, -problem.walls.height, -problem.walls.height, problem.walls.height]
     goals.append(problem.goal)
     for dx, dy in zip(goals_dx, goals_dy):
-        goals.append(incrementWithGoAround(problem.goal[0], problem.goal[1], dx, dy, problem.walls))
+        goals.append((problem.goal[0] + dx, problem.goal[1] + dy))
 
     distances = []
     for goal in goals:
